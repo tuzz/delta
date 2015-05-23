@@ -2,8 +2,8 @@ class Delta
   def initialize(from:, to:, pluck: nil, keys: nil)
     @from       = from.lazy
     @to         = to.lazy
-    @identifier = keys ? Identifier.new(keys) : Identifier::Null.new
     @plucker    = pluck ? Plucker.new(pluck) : Plucker::Null.new
+    @identifier = keys ? Identifier.new(keys) : Identifier::Null.new
   end
 
   def additions
