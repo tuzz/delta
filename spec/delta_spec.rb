@@ -125,4 +125,35 @@ RSpec.describe Delta do
     expect(second.type).to eq "Flying"
   end
 
+  it "worls for the composite key example in the readme" do
+    butterfree.name = "FANG!"
+    magikarp.name = "FANG!"
+
+    delta = Delta.new(
+      from: [pikachu, pidgey, magikarp],
+      to: [raichu, pidgey, butterfree],
+      pluck: [:species, :name, :type],
+      keys: [:name, :type]
+    )
+
+    expect(delta.additions.count).to eq 1
+    expect(delta.modifications.count).to eq 1
+    expect(delta.deletions.count).to eq 1
+
+    addition = delta.additions.first
+    expect(addition.species).to eq("Butterfree")
+    expect(addition.name).to eq("FANG!")
+    expect(addition.type).to eq("Flying")
+
+    modification = delta.modifications.first
+    expect(modification.species).to eq("Raichu")
+    expect(modification.name).to eq("Zappy")
+    expect(modification.type).to eq("Electric")
+
+    deletion = delta.deletions.first
+    expect(deletion.species).to eq("Magikarp")
+    expect(deletion.name).to eq("FANG!")
+    expect(deletion.type).to eq("Water")
+  end
+
 end

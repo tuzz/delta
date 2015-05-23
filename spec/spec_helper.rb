@@ -8,7 +8,7 @@ RSpec.configure do |config|
 end
 
 class Pokemon
-  attr_reader :species, :name, :level, :type
+  attr_accessor :species, :name, :level, :type
 
   def initialize(species, name, type)
     @species = species
