@@ -2,6 +2,7 @@ class Delta
   class Plucker
     def initialize(pluck)
       @pluck = pluck
+      @struct = Struct.new(*@pluck)
     end
 
     def pluck(object)
@@ -18,9 +19,7 @@ class Delta
 
     private
 
-    def struct
-      @struct ||= Struct.new(*@pluck)
-    end
+    attr_reader :struct
 
     class Null
       def pluck(object)
