@@ -7,8 +7,6 @@ class Identifier
     @keys.map { |k| object.public_send(k) }
   end
 
-  private
-
   class Null
     def identity(object)
       object
