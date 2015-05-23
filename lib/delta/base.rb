@@ -1,13 +1,13 @@
 class Delta
   def initialize(from:, to:, pluck: nil, keys: nil)
     identifier = keys ? Identifier.new(keys) : Identifier::Null.new
-    self.set_operator = SetOperator.new(a: from, b: to, identifier: identifier)
+    self.set = SetOperator.new(a: from, b: to, identifier: identifier)
     self.plucker = pluck ? Plucker.new(pluck) : Plucker::Null.new
   end
 
   def additions
     Enumerator.new do |y|
-      set_operator.subtract_a_from_b.each do |b|
+      set.subtract_a_from_b.each do |b|
         y.yield plucker.pluck(b)
       end
     end
@@ -15,7 +15,7 @@ class Delta
 
   def modifications
     Enumerator.new do |y|
-      set_operator.intersection.each do |a, b|
+      set.intersection.each do |a, b|
         b_attributes = plucker.pluck_intersection(a, b)
         y.yield b_attributes if b_attributes
       end
@@ -24,7 +24,7 @@ class Delta
 
   def deletions
     Enumerator.new do |y|
-      set_operator.subtract_b_from_a.each do |a|
+      set.subtract_b_from_a.each do |a|
         y.yield plucker.pluck(a)
       end
     end
@@ -32,5 +32,5 @@ class Delta
 
   private
 
-  attr_accessor :set_operator, :plucker
+  attr_accessor :set, :plucker
 end
