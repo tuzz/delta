@@ -1,59 +1,42 @@
+require "delta/plucker"
+require "delta/identifier"
+
 class Delta
   def initialize(from:, to:, pluck: nil, keys: nil)
-    @from  = from.lazy
-    @to    = to.lazy
-    @pluck = pluck
-    @keys  = keys
+    @from       = from.lazy
+    @to         = to.lazy
+    @identifier = keys ? Identifier.new(keys) : Identifier::Null.new
+    @plucker    = pluck ? Plucker.new(pluck) : Plucker::Null.new
   end
 
   def additions
     Enumerator.new do |y|
-      if pluck
-        subtract(to, from).each do |object|
-          y.yield attributes(object)
-        end
-      else
-        subtract(to, from).each do |object|
-          y.yield object
-        end
+      subtract(to, from).each do |object|
+        y.yield plucker.pluck(object)
       end
     end
   end
 
   def modifications
     Enumerator.new do |y|
-      if pluck
-        intersection(from, to).each do |from_object, to_object|
-          from_attributes = attributes(from_object)
-          to_attributes = attributes(to_object)
-
-          y.yield to_attributes unless from_attributes == to_attributes
-        end
-      else
-        intersection(from, to).each do |_, to_object|
-          y.yield to_object
-        end
+      intersection(from, to).each do |from_object, to_object|
+        to_attributes = plucker.pluck_intersection(from_object, to_object)
+        y.yield to_attributes if to_attributes
       end
     end
   end
 
   def deletions
     Enumerator.new do |y|
-      if pluck
-        subtract(from, to).each do |object|
-          y.yield attributes(object)
-        end
-      else
-        subtract(from, to).each do |object|
-          y.yield object
-        end
+      subtract(from, to).each do |object|
+        y.yield plucker.pluck(object)
       end
     end
   end
 
   private
 
-  attr_reader :from, :to, :pluck, :keys
+  attr_reader :from, :to, :plucker, :identifier
 
   # TODO: Inject a collection adapter?
   def subtract(a, b)
@@ -61,29 +44,15 @@ class Delta
   end
 
   def intersection(a, b)
-    a.map { |a_object| [a_object, other_object(b, a_object)] }.
-      select { |_, b_object| b_object }
+    a.map { |a_object| [a_object, other_object(b, a_object)] }
+      .select { |_, b_object| b_object }
   end
 
   def other_object(collection, object)
-    identifier = identifier(object)
+    identity = identifier.identity(object)
 
     collection.find do |other_object|
-      identifier == identifier(other_object)
+      identity == identifier.identity(other_object)
     end
-  end
-
-  def identifier(object)
-    return object unless keys
-    keys.map { |k| object.public_send(k) }
-  end
-
-  def attributes(object)
-    attributes = pluck.map { |k| object.public_send(k) }
-    struct.new(*attributes)
-  end
-
-  def struct
-    @struct ||= Struct.new(*pluck)
   end
 end
