@@ -18,16 +18,14 @@ RSpec.describe Delta do
     expect(delta.deletions).to be_an(Enumerator)
 
     expect(delta.additions.to_a).to eq [raichu, butterfree]
-    expect(delta.modifications.to_a).to eq []
     expect(delta.deletions.to_a).to eq [pikachu, magikarp]
   end
 
   it "works for the pluck example in the readme" do
     delta = described_class.new(from: from, to: to, pluck: [:name, :species])
 
-    expect(delta.additions.count).to eq 2
-    expect(delta.modifications.count).to eq 0
-    expect(delta.deletions.count).to eq 2
+    expect(delta.additions.count).to eq(2)
+    expect(delta.deletions.count).to eq(2)
 
     first, second = *delta.additions
 
@@ -48,6 +46,38 @@ RSpec.describe Delta do
     expect(second.name).to eq("Splashy")
     expect(second.species).to eq("Magikarp")
     expect(second).to_not respond_to(:type)
+  end
+
+  it "works for the modification example in the readme (option 1)" do
+    # Add the equality method to Pokemon.
+    Pokemon.class_eval do
+      def ==(other)
+        name == other.name
+      end
+    end
+
+    delta = described_class.new(from: from, to: to, pluck: [:species, :name])
+
+    expect(delta.additions.count).to eq 1
+    expect(delta.modifications.count).to eq 1
+    expect(delta.deletions.count).to eq 1
+
+    addition = delta.additions.first
+    expect(addition.species).to eq "Butterfree"
+    expect(addition.name).to eq "Flappy"
+
+    modification = delta.modifications.first
+    expect(modification.species).to eq "Raichu"
+    expect(modification.name).to eq "Zappy"
+
+    deletion = delta.deletions.first
+    expect(deletion.species).to eq "Magikarp"
+    expect(deletion.name).to eq "Splashy"
+
+    # Remove the equality method from Pokemon.
+    Pokemon.class_eval do
+      undef :==
+    end
   end
 
 end

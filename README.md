@@ -82,6 +82,7 @@ collections.
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
+  pluck: [:species, :name],
   keys: [:name]
 )
 ```
@@ -90,14 +91,23 @@ These options are equivalent and will produce the same results:
 
 ```ruby
 delta.additions.to_a
-#=> [#<Pokemon @species="Butterfree", @name="Flappy", @type="Flying"]
+#=> [#<struct species="Butterfree", name="Flappy">]
 
 delta.modifications.to_a
-#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric"]
+#=> [#<struct species="Raichu", name="Zappy">]
 
 delta.deletions.to_a
-#=> [#<Pokemon @species="Magikarp", @name="Splashy", @type="Water">]
+#=> [#<struct species="Magikarp", name="Splashy">]
 ```
+
+Regardless of which option you choose, you should specify the attributes to
+`pluck` so that Delta can distinguish between objects that have changed and
+objects that have not changed, but appear in both collections.
+
+If you do not specify any attributes to `pluck`, objects that appears in both
+collections will register as modifications. This is a reasonable use case, but
+the caller is then responsible for filtering the modifications down to those
+that represent genuine changes.
 
 ## Composite Keys
 
@@ -112,17 +122,18 @@ In these cases, you can specify multiple keys:
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
+  pluck: [:species, :name, :type],
   keys: [:name, :type] # <--
 )
 
 delta.additions.to_a
-#=> [#<Pokemon @species="Butterfree", @name="FANG!", @type="Flying">]
+#=> [#<struct species="Butterfree", name="FANG!", type="Flying">]
 
 delta.modifications.to_a
-#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric">]
+#=> [#<struct species="Raichu", name="Zappy", type="Electric">]
 
 delta.deletions.to_a
-#=> [#<Pokemon @species="Magikarp", @name="FANG!", @type="Water">]
+#=> [#<struct species="Magikarp", name="FANG!", type="Water">]
 ```
 
 Consider the alternative where 'name' is used as the only key. This would mean
