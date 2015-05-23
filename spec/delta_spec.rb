@@ -76,7 +76,9 @@ RSpec.describe Delta do
 
     # Remove the equality method from Pokemon.
     Pokemon.class_eval do
-      undef :==
+      def ==(other)
+        object_id == other.object_id
+      end
     end
   end
 
@@ -103,6 +105,24 @@ RSpec.describe Delta do
     deletion = delta.deletions.first
     expect(deletion.species).to eq "Magikarp"
     expect(deletion.name).to eq "Splashy"
+  end
+
+  it "works as specified when no pluck attributes are specified" do
+    delta = described_class.new(from: from, to: to, keys: [:name])
+
+    expect(delta.additions.count).to eq 1
+    expect(delta.modifications.count).to eq 2
+    expect(delta.deletions.count).to eq 1
+
+    first, second = *delta.modifications
+
+    expect(first.species).to eq "Raichu"
+    expect(first.name).to eq "Zappy"
+    expect(first.type).to eq "Electric"
+
+    expect(second.species).to eq "Pidgey"
+    expect(second.name).to eq "Mr. Peck"
+    expect(second.type).to eq "Flying"
   end
 
 end

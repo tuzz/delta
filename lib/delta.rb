@@ -17,10 +17,18 @@ class Delta
   def modifications
     Enumerator.new do |y|
       intersection(from, to).each do |from_object, to_object|
-        from_attributes = attributes(from_object)
         to_attributes = attributes(to_object)
 
-        y.yield to_attributes unless from_attributes == to_attributes
+        unless pluck
+          y.yield to_attributes
+          next
+        end
+
+        from_attributes = attributes(from_object)
+
+        unless from_attributes == to_attributes
+          y.yield to_attributes
+        end
       end
     end
   end
@@ -57,9 +65,7 @@ class Delta
 
   def identifier(object)
     return object unless keys
-
-    identifier = keys.map { |k| object.public_send(k) }
-    struct.new(*identifier)
+    keys.map { |k| object.public_send(k) }
   end
 
   def attributes(object)
