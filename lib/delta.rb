@@ -8,26 +8,30 @@ class Delta
 
   def additions
     Enumerator.new do |y|
-      subtract(to, from).each do |object|
-        y.yield attributes(object)
+      if pluck
+        subtract(to, from).each do |object|
+          y.yield attributes(object)
+        end
+      else
+        subtract(to, from).each do |object|
+          y.yield object
+        end
       end
     end
   end
 
   def modifications
     Enumerator.new do |y|
-      intersection(from, to).each do |from_object, to_object|
-        to_attributes = attributes(to_object)
+      if pluck
+        intersection(from, to).each do |from_object, to_object|
+          from_attributes = attributes(from_object)
+          to_attributes = attributes(to_object)
 
-        unless pluck
-          y.yield to_attributes
-          next
+          y.yield to_attributes unless from_attributes == to_attributes
         end
-
-        from_attributes = attributes(from_object)
-
-        unless from_attributes == to_attributes
-          y.yield to_attributes
+      else
+        intersection(from, to).each do |_, to_object|
+          y.yield to_object
         end
       end
     end
@@ -35,8 +39,14 @@ class Delta
 
   def deletions
     Enumerator.new do |y|
-      subtract(from, to).each do |object|
-        y.yield attributes(object)
+      if pluck
+        subtract(from, to).each do |object|
+          y.yield attributes(object)
+        end
+      else
+        subtract(from, to).each do |object|
+          y.yield object
+        end
       end
     end
   end
@@ -69,8 +79,6 @@ class Delta
   end
 
   def attributes(object)
-    return object unless pluck
-
     attributes = pluck.map { |k| object.public_send(k) }
     struct.new(*attributes)
   end
