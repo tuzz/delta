@@ -1,6 +1,6 @@
 class Delta
   class SetOperator
-    def initialize(a: a, b: b, identifier: identifier)
+    def initialize(a:, b:, identifier:)
       self.a = a
       self.b = b
       self.identifier = identifier
