@@ -7,25 +7,25 @@ class Delta
 
   def additions
     Enumerator.new do |y|
-      set_operator.subtract_a_from_b.each do |object|
-        y.yield plucker.pluck(object)
+      set_operator.subtract_a_from_b.each do |b|
+        y.yield plucker.pluck(b)
       end
     end
   end
 
   def modifications
     Enumerator.new do |y|
-      set_operator.intersection.each do |from_object, to_object|
-        to_attributes = plucker.pluck_intersection(from_object, to_object)
-        y.yield to_attributes if to_attributes
+      set_operator.intersection.each do |a, b|
+        b_attributes = plucker.pluck_intersection(a, b)
+        y.yield b_attributes if b_attributes
       end
     end
   end
 
   def deletions
     Enumerator.new do |y|
-      set_operator.subtract_b_from_a.each do |object|
-        y.yield plucker.pluck(object)
+      set_operator.subtract_b_from_a.each do |a|
+        y.yield plucker.pluck(a)
       end
     end
   end

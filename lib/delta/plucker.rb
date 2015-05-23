@@ -10,11 +10,9 @@ class Delta
       struct.new(*attributes)
     end
 
-    def pluck_intersection(from_object, to_object)
-      from_attributes = pluck(from_object)
-      to_attributes = pluck(to_object)
-
-      from_attributes == to_attributes ? nil : to_attributes
+    def pluck_intersection(a, b)
+      a_attributes, b_attributes = pluck(a), pluck(b)
+      b_attributes unless a_attributes == b_attributes
     end
 
     private
@@ -26,8 +24,8 @@ class Delta
         object
       end
 
-      def pluck_intersection(_, to_object)
-        to_object
+      def pluck_intersection(_, b)
+        b
       end
     end
   end

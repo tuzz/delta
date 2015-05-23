@@ -30,7 +30,7 @@ RSpec.describe Delta::Plucker do
     context "whent the resulting attributes are not equal" do
       let(:args) { [pikachu, pidgey] }
 
-      it "returns the an object based on the to_object" do
+      it "returns an object based on the second argument" do
         result = subject.pluck_intersection(*args)
 
         expect(result.name).to eq("Mr. Peck")
