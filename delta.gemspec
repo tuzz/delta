@@ -2,7 +2,7 @@ Gem::Specification.new do |s|
   s.name        = "delta"
   s.version     = "1.0.0"
   s.summary     = "Delta"
-  s.description = "Coming soon..."
+  s.description = "Calculates the delta between two collections of objects."
   s.author      = "Chris Patuzzo"
   s.email       = "chris@patuzzo.co.uk"
   s.homepage    = "https://github.com/tuzz/delta"
