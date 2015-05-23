@@ -1,12 +1,12 @@
 class Delta
   class Plucker
     def initialize(pluck)
-      @pluck = pluck
-      @struct = Struct.new(*@pluck)
+      self.array = pluck
+      self.struct = Struct.new(*array)
     end
 
     def pluck(object)
-      attributes = @pluck.map { |k| object.public_send(k) }
+      attributes = array.map { |k| object.public_send(k) }
       struct.new(*attributes)
     end
 
@@ -19,7 +19,7 @@ class Delta
 
     private
 
-    attr_reader :struct
+    attr_accessor :array, :struct
 
     class Null
       def pluck(object)
