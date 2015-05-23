@@ -1,7 +1,7 @@
 class Delta
   def initialize(from:, to:, pluck: nil, keys: nil)
     identifier = keys ? Identifier.new(keys) : Identifier::Null.new
-    self.set = SetOperator.new(a: from, b: to, identifier: identifier)
+    self.set = SetOperator.adapt(a: from, b: to, identifier: identifier)
     self.plucker = pluck ? Plucker.new(pluck) : Plucker::Null.new
   end
 
