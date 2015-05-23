@@ -18,26 +18,65 @@ delta.additions
 
 delta.additions.to_a
 #=> [
-  #<Pokemon @species="Raichu", @name="Zappy", @level=30, @type="Electric">,
-  #<Pokemon @species="Butterfree", @name="Flappy", @level=20, @type="Flying">
+  #<Pokemon @species="Raichu", @name="Zappy", @type="Electric">,
+  #<Pokemon @species="Butterfree", @name="Flappy", @type="Flying">
 ]
 
 delta.deletions.to_a
 #=> [
-  #<Pokemon @species="Pikachu", @name="Zappy", @level=29, @type="Electric">,
-  #<Pokemon @species="Magikarp", @name="Splashy", @level=5, @type="Water">
+  #<Pokemon @species="Pikachu", @name="Zappy", @type="Electric">,
+  #<Pokemon @species="Magikarp", @name="Splashy", @type="Water">
+]
+```
+
+## Pluck
+
+Sometimes, you'll only be interested in a few of the attributes on an object.
+Delta supports `pluck`, which selects only the attributes you're interested in,
+instead of returning full objects:
+
+```ruby
+delta = Delta.new(
+  from: [pikachu, pidgey, magikarp],
+  to: [raichu, pidgey, butterfree],
+  pluck: [:name, :species]
+)
+
+delta.additions.to_a
+#=> [
+  #<struct name="Zappy", species="Pikachu">,
+  #<struct name="Flappy", species="Butterfree">
+]
+
+delta.deletions.to_a
+#=> [
+  #<struct name="Zappy", species="Raichu">,
+  #<struct name="Splashy", species="Magikarp">
 ]
 ```
 
 ## Modifications
 
-In some cases, it may be more appropriate to think in terms of modifications
-rather than additions and deletions.
+In most cases, it is more appropriate to think in terms of modifications rather
+than additions and deletions. In the example above, 'Pikachu' appeared as a
+deletion and 'Raichu' appeared as an addition. It might make more sense to model
+this as a modification, i.e. 'Zappy' changing its 'species'.
 
-By default, Delta uses
-[object equality](http://ruby-doc.org/core-2.2.2/Object.html#method-i-eql-3F) to
-calculate differences. If you want to change this, you can specify the `keys`
-that uniquely identify each object:
+You can do this in one of two ways:
+
+1) You can define the equality method on the objects that appear in the
+collections. e.g.
+
+```ruby
+class Pokemon
+  def ==(other)
+    name == other.name
+  end
+end
+```
+
+2) You can specify the `keys` that uniquely identify objects between
+collections.
 
 ```ruby
 delta = Delta.new(
@@ -45,80 +84,62 @@ delta = Delta.new(
   to: [raichu, pidgey, butterfree],
   keys: [:name]
 )
-
-delta.additions.to_a
-#=> [#<Pokemon @species="Butterfree", @name="Flappy", @level=20, @type="Flying">]
-
-delta.modifications.to_a
-#=> [#<Pokemon @species="Raichu", @name="Zappy", @level=30, @type="Electric">]
-
-delta.deletions.to_a
-#=> [#<Pokemon @species="Magikarp", @name="Splashy", @level=5, @type="Water">]
 ```
 
-In this example, 'Zappy' has had his species modified, but he is still the same
-Pokemon. This may be more semantically correct, depending on your domain.
+These options are equivalent and will produce the same results:
 
-## Composite Keys
+```ruby
+delta.additions.to_a
+#=> [#<Pokemon @species="Butterfree", @name="Flappy", @type="Flying"]
 
-Sometimes an object will be uniquely identified by a combination of things. If
-this is the case, you can specify a composite key.
+delta.modifications.to_a
+#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric"]
 
-For example, if your application enforces that the names of Pokemon must only be
-unique within a particular type, the following may be more appropriate:
+delta.deletions.to_a
+#=> [#<Pokemon @species="Magikarp", @name="Splashy", @type="Water">]
+```
+
+## Composite Keys
+
+In some cases, objects will be uniquely identified by a combination of things.
+For example, consider an application that enforces the uniqueness of names, but
+only in the context of a 'type'. This would mean that two Pokemon can have the
+same name, as long as they are not of the same type (e.g. 'Water').
+
+In these cases, you can specify multiple keys:
 
 ```ruby
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
-  keys: [:name, :type] # <-- Composite key
+  keys: [:name, :type] # <--
 )
 
 delta.additions.to_a
-#=> [#<Pokemon @species="Butterfree", @name="FANG!", @level=20, @type="Flying">]
+#=> [#<Pokemon @species="Butterfree", @name="FANG!", @type="Flying">]
 
 delta.modifications.to_a
-#=> [#<Pokemon @species="Raichu", @name="Zappy", @level=30, @type="Electric">]
+#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric">]
 
 delta.deletions.to_a
-#=> [#<Pokemon @species="Magikarp", @name="FANG!", @level=20, @type="Water">]
+#=> [#<Pokemon @species="Magikarp", @name="FANG!", @type="Water">]
 ```
 
-In this example, a single key of 'name' would not be sufficient to uniquely
-identify objects as there are two Pokemon called 'FANG!'.
+Consider the alternative where 'name' is used as the only key. This would mean
+that the Pokemon with species' 'Butterfree' and 'Magikarp' would be considered
+the same. This is semantically incorrect for this particular domain.
 
 TODO: What would happen if you did that? Should it raise an error?
 
-## Pluck
-
-In some cases, you may only be interested in a handful of attributes. Delta
-supports `pluck`, which selects only the attributes you want, instead of
-returning full objects:
-
-```ruby
-delta = Delta.new(
-  from: [pikachu, pidgey, magikarp],
-  to: [raichu, pidgey, butterfree],
-  pluck: [:level, :species]
-)
-
-delta.additions.to_a
-#=> [#<struct level=30, species="Raichu">, #<struct level=20, type="Butterfree">]
-
-delta.modifications.to_a
-#=> []
-
-delta.deletions.to_a
-#=> [#<struct level=29, type="Pikachu">, #<struct level=5, type="Magikarp">]
-```
-
 ## Many-to-one Deltas
 
-By combinating `keys` and `pluck` you can build deltas that aren't necessarily
-related to a single object, but instead, span multiple objects.
+By combining the use of `pluck` and `keys`, you can build deltas that aren't
+necessarily related to a single object, but instead span multiple objects within
+the collection.
 
-This may be useful if there are many objects in your collections that share some
-property. Here's an example that calculates a Delta of Pokemon types:
+This may be useful if there are objects in your collections that share some
+property. In this example, all of the Pokemon have a 'type'. We can build a
+Delta that shows the difference in types between collections, like so:
 
 ```ruby
 delta = Delta.new(
@@ -138,9 +159,27 @@ delta.deletions.to_a
 #=> [#<struct type="Water">]
 ```
 
-In this example, both 'Electric' and 'Flying' types remain in the collection.
+In this example, both 'Electric' and 'Flying' types appear in both collections.
 The only difference is the deletion of all 'Water' type Pokemon as a result of
-removing 'Magikarp' from the collection.
+removing 'Magikarp' from the first collection.
+
+## In the Wild
+
+So far, we've talked a lot about Pokemon, but how is this useful in the
+real-world?
+
+Consider an application that is backed by an external content management system.
+You have some kind of extract-transform-load process that takes content from the
+CMS and pushes it into your database. Your application is serving live traffic
+and needs to remain available at all times.
+
+To minimise the amount of churn on your database, it makes sense to calculate
+just the things that have changed, rather than rebuilding the entire set of
+content each time. To do this, you could push the CMS content into a staging
+database where you calculate a Delta without touching your live application.
+
+Once this Delta is calculated, you can then stream the minimal set of changes
+to the database that backs your application.
 
 ## Contribution
 

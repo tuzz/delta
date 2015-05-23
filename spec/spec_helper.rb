@@ -10,11 +10,9 @@ end
 class Pokemon
   attr_reader :species, :name, :level, :type
 
-  def initialize(species, name, level, type)
+  def initialize(species, name, type)
     @species = species
     @name = name
-    @level = level
     @type = type
   end
 end
-

@@ -1,5 +1,4 @@
 class Delta
-
   def initialize(from:, to:)
     @from = from
     @to = to
@@ -14,7 +13,7 @@ class Delta
   end
 
   def modifications
-    Enumerator.new do |y|
+    Enumerator.new do |_y|
 
     end
   end
@@ -29,10 +28,13 @@ class Delta
 
   private
 
-  def subtract(a, b)
-    a.reject { |e| b.include?(e) }
-  end
-
   attr_reader :from, :to
 
+  def subtract(a, b)
+    a.reject do |a_element|
+      b.any? do |b_element|
+        a_element == b_element
+      end
+    end
+  end
 end
