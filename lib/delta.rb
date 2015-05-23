@@ -50,16 +50,15 @@ class Delta
     Enumerator.new do |y|
       a.each do |a_object|
         a_identifier = identifier(a_object)
+        b_object = other_object(b, a_identifier)
 
-        b.any? do |b_object|
-          b_identifier = identifier(b_object)
-
-          if a_identifier == b_identifier
-            y.yield [a_object, b_object]
-          end
-        end
+        y.yield [a_object, b_object] if b_object
       end
     end
+  end
+
+  def other_object(collection, identifier)
+    collection.detect { |object| identifier == identifier(object) }
   end
 
   def identifier(object)
