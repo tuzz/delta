@@ -156,4 +156,20 @@ RSpec.describe Delta do
     expect(deletion.type).to eq("Water")
   end
 
+  it "works for the many-to-one example in the readme" do
+    delta = Delta.new(
+      from: [pikachu, pidgey, magikarp],
+      to: [raichu, pidgey, butterfree],
+      keys: [:type],
+      pluck: [:type]
+    )
+
+    expect(delta.additions.count).to eq 0
+    expect(delta.modifications.count).to eq 0
+    expect(delta.deletions.count).to eq 1
+
+    deletion = delta.deletions.first
+    expect(deletion.type).to eq("Water")
+  end
+
 end
