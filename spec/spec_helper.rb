@@ -11,8 +11,8 @@ class Pokemon
   attr_accessor :species, :name, :level, :type
 
   def initialize(species, name, type)
-    @species = species
-    @name = name
-    @type = type
+    self.species = species
+    self.name = name
+    self.type = type
   end
 end
