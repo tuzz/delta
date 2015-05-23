@@ -1,7 +1,7 @@
 class Delta
   def initialize(from:, to:, pluck: nil, keys: nil)
-    @from  = from
-    @to    = to
+    @from  = from.lazy
+    @to    = to.lazy
     @pluck = pluck
     @keys  = keys
   end
@@ -39,26 +39,20 @@ class Delta
 
   # TODO: Inject a collection adapter?
   def subtract(a, b)
-    a.reject do |a_object|
-      b.any? do |b_object|
-        a_object == b_object
-      end
-    end
+    a.reject { |a_object| other_object(b, a_object) }
   end
 
   def intersection(a, b)
-    Enumerator.new do |y|
-      a.each do |a_object|
-        a_identifier = identifier(a_object)
-        b_object = other_object(b, a_identifier)
-
-        y.yield [a_object, b_object] if b_object
-      end
-    end
+    a.map { |a_object| [a_object, other_object(b, a_object)] }.
+      select { |_, b_object| b_object }
   end
 
-  def other_object(collection, identifier)
-    collection.detect { |object| identifier == identifier(object) }
+  def other_object(collection, object)
+    identifier = identifier(object)
+
+    collection.find do |other_object|
+      identifier == identifier(other_object)
+    end
   end
 
   def identifier(object)

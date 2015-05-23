@@ -80,4 +80,29 @@ RSpec.describe Delta do
     end
   end
 
+  it "works for the modification example in the readme (option 2)" do
+    delta = described_class.new(
+      from: from,
+      to: to,
+      pluck: [:species, :name],
+      keys: [:name]
+    )
+
+    expect(delta.additions.count).to eq 1
+    expect(delta.modifications.count).to eq 1
+    expect(delta.deletions.count).to eq 1
+
+    addition = delta.additions.first
+    expect(addition.species).to eq "Butterfree"
+    expect(addition.name).to eq "Flappy"
+
+    modification = delta.modifications.first
+    expect(modification.species).to eq "Raichu"
+    expect(modification.name).to eq "Zappy"
+
+    deletion = delta.deletions.first
+    expect(deletion.species).to eq "Magikarp"
+    expect(deletion.name).to eq "Splashy"
+  end
+
 end
