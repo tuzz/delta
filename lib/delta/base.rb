@@ -16,8 +16,10 @@ class Delta
   def modifications
     Enumerator.new do |y|
       set.intersection.each do |a, b|
-        b_attributes = plucker.pluck_intersection(a, b)
-        y.yield b_attributes if b_attributes
+        a_attributes = plucker.pluck(a)
+        b_attributes = plucker.pluck(b)
+
+        y.yield b_attributes unless a_attributes == b_attributes
       end
     end
   end

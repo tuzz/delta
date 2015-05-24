@@ -107,25 +107,22 @@ RSpec.describe Delta do
     expect(deletion.name).to eq "Splashy"
   end
 
-  it "works as specified when no pluck attributes are specified" do
+  it "falls back object equality when no pluck attributes are specified" do
+    # Note: pidgey is the same object in both collections.
+
     delta = described_class.new(from: from, to: to, keys: [:name])
 
     expect(delta.additions.count).to eq 1
-    expect(delta.modifications.count).to eq 2
+    expect(delta.modifications.count).to eq 1
     expect(delta.deletions.count).to eq 1
 
-    first, second = *delta.modifications
-
-    expect(first.species).to eq "Raichu"
-    expect(first.name).to eq "Zappy"
-    expect(first.type).to eq "Electric"
-
-    expect(second.species).to eq "Pidgey"
-    expect(second.name).to eq "Mr. Peck"
-    expect(second.type).to eq "Flying"
+    modification = delta.modifications.first
+    expect(modification.species).to eq "Raichu"
+    expect(modification.name).to eq "Zappy"
+    expect(modification.type).to eq "Electric"
   end
 
-  it "worls for the composite key example in the readme" do
+  it "works for the composite key example in the readme" do
     butterfree.name = "FANG!"
     magikarp.name = "FANG!"
 

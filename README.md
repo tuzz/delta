@@ -104,10 +104,8 @@ Regardless of which option you choose, you should specify the attributes to
 `pluck` so that Delta can distinguish between objects that have changed and
 objects that have not changed, but appear in both collections.
 
-If you do not specify any attributes to `pluck`, objects that appears in both
-collections will register as modifications. This is a reasonable use case, but
-the caller is then responsible for filtering the modifications down to those
-that represent genuine changes.
+If you do not specify any attributes to `pluck`, Delta will fall back to using
+the equality method to determine which objects have been modified.
 
 ## Composite Keys
 
