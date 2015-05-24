@@ -1,7 +1,7 @@
 class Delta
   module SetOperator
     def self.adapt(a:, b:, identifier:)
-      adapter = Enumerator
+      adapter = Enumerable
       adapter.new(a: a, b: b, identifier: identifier)
     end
   end

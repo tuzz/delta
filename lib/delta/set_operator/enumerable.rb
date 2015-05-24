@@ -1,6 +1,6 @@
 class Delta
   module SetOperator
-    class Enumerator
+    class Enumerable
       def initialize(a:, b:, identifier:)
         self.a = a
         self.b = b
