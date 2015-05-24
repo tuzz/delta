@@ -1,5 +1,6 @@
 require "delta/base"
 require "delta/set_operator"
 require "delta/set_operator/enumerable"
+require "delta/set_operator/active_record"
 require "delta/plucker"
 require "delta/identifier"

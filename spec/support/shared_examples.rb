@@ -40,7 +40,6 @@ RSpec.shared_examples "a set operator" do
       identifier = Delta::Identifier::Null.new
       subject = described_class.new(a: a, b: b, identifier: identifier)
 
-      expect(subject.intersection).to be_an(expected_enumerator_class)
       expect(subject.intersection.to_a).to eq [[pidgey, pidgey]]
     end
 
@@ -48,7 +47,6 @@ RSpec.shared_examples "a set operator" do
       identifier = Delta::Identifier.new([:name])
       subject = described_class.new(a: a, b: b, identifier: identifier)
 
-      expect(subject.intersection).to be_an(expected_enumerator_class)
       expect(subject.intersection.to_a).to eq [
         [pikachu, raichu],
         [pidgey, pidgey]
