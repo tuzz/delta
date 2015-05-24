@@ -1,6 +1,10 @@
 class Delta
   class SetOperator
     class Enumerable < SetOperator
+      def self.compatible?(_a, _b)
+        true
+      end
+
       def initialize(a:, b:, identifier:)
         super
 

@@ -17,7 +17,7 @@ RSpec.describe Delta::SetOperator do
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
 
     a, b = Model.all, Model.all
-    expect(adapt(a, b)).to be_a(described_class::Enumerable)
+    expect(adapt(a, b)).to be_a(described_class::ActiveRecord)
   end
 
   it "falls back to using Enumerable when the types are mixed" do

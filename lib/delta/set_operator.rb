@@ -1,7 +1,11 @@
 class Delta
   class SetOperator
+    ADAPTERS = [ActiveRecord, Enumerable]
+
     def self.adapt(a:, b:, identifier:)
-      adapter = Enumerable
+      adapter = ADAPTERS.find { |klass| klass.compatible?(a, b) }
+      adapter = ADAPTERS.last unless adapter
+
       adapter.new(a: a, b: b, identifier: identifier)
     end
 

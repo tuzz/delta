@@ -1,6 +1,10 @@
 class Delta
   class SetOperator
     class ActiveRecord < SetOperator
+      def self.compatible?(a, b)
+        a.is_a?(b.class) && a.class.name.include?("ActiveRecord")
+      end
+
       private
 
       def subtract(a, b)
@@ -19,8 +23,6 @@ class Delta
           end
         end
       end
-
-      private
 
       def identity_keys(collection)
         identifier.identities(collection).keys
