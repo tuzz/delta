@@ -12,7 +12,7 @@ class Delta
 
     attr_accessor :keys
 
-    def cache(key, &block)
+    def cache(key)
       @cache ||= {}
       @cache.key?(key) ? @cache.fetch(key) : @cache[key] = yield
     end
