@@ -10,7 +10,7 @@ RSpec.configure do |config|
 end
 
 class Pokemon
-  attr_accessor :species, :name, :level, :type
+  attr_accessor :species, :name, :type
 
   def initialize(species, name, type)
     self.species = species
