@@ -5,12 +5,17 @@ class Delta
     end
 
     def identity(object)
-      keys.map { |k| object.public_send(k) }
+      cache(object) { keys.map { |k| object.public_send(k) } }
     end
 
     private
 
     attr_accessor :keys
+
+    def cache(key, &block)
+      @cache ||= {}
+      @cache.key?(key) ? @cache.fetch(key) : @cache[key] = yield
+    end
 
     class Null
       def identity(object)

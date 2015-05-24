@@ -24,6 +24,23 @@ RSpec.describe Delta::Identifier do
       .to raise_error(NoMethodError)
   end
 
+  it "caches the result for subsequent calls" do
+    class SomeObject
+      attr_accessor :string
+
+      def initialize(string)
+        self.string = string
+      end
+    end
+
+    foo = SomeObject.new("foo")
+    subject = described_class.new([:string])
+
+    expect(subject.identity(foo)).to eq(["foo"])
+    foo.string = "bar"
+    expect(subject.identity(foo)).to eq(["foo"])
+  end
+
   describe "null object" do
     subject { described_class::Null.new }
 
