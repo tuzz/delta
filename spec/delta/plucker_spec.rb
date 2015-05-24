@@ -7,24 +7,20 @@ RSpec.describe Delta::Plucker do
 
   subject { described_class.new([:name, :type]) }
 
-  describe "#pluck" do
-    it "returns an object with methods specified by the initializer" do
-      result = subject.pluck(pikachu)
+  it "returns an object with methods specified by the initializer" do
+    result = subject.pluck(pikachu)
 
-      expect(result.name).to eq("Zappy")
-      expect(result.type).to eq("Electric")
-      expect(result).to_not respond_to(:species)
-    end
+    expect(result.name).to eq("Zappy")
+    expect(result.type).to eq("Electric")
+    expect(result).to_not respond_to(:species)
   end
 
   describe "null object" do
     subject { described_class::Null.new }
 
-    describe "#pluck" do
-      it "returns the given object" do
-        object = Object.new
-        expect(subject.pluck(object)).to eq(object)
-      end
+    it "returns the given object" do
+      object = Object.new
+      expect(subject.pluck(object)).to eq(object)
     end
   end
 end

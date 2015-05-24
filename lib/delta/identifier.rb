@@ -5,7 +5,11 @@ class Delta
     end
 
     def identity(object)
-      cache(object) { keys.map { |k| object.public_send(k) } }
+      cache(object) { Hash[keys.map { |k| [k, object.public_send(k)] }] }
+    end
+
+    def identities(collection)
+      cache(collection) { Hash[keys.map { |k| [k, collection.pluck(k).uniq] }] }
     end
 
     private
@@ -17,9 +21,16 @@ class Delta
       @cache.key?(key) ? @cache.fetch(key) : @cache[key] = yield
     end
 
-    class Null
+    class Null < Identifier
+      def initialize
+      end
+
       def identity(object)
         object
+      end
+
+      def identities(collection)
+        cache(collection) { { id: collection.pluck(:id) } }
       end
     end
   end
