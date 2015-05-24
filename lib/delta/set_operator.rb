@@ -28,12 +28,12 @@ class Delta
     attr_accessor :a, :b, :identifier
 
     # a - b
-    def subtract(a, b)
+    def subtract(_a, _b)
       fail NotImplementedError, "override me"
     end
 
     # a & b
-    def intersect(a, b)
+    def intersect(_a, _b)
       fail NotImplementedError, "override me"
     end
   end
