@@ -74,7 +74,7 @@ RSpec.describe Delta::SetOperator::Enumerable do
       end
 
       def something
-        raise "Won't get fooled again" if @fooled_me_once
+        fail "Won't get fooled again" if @fooled_me_once
         @fooled_me_once = true
         @string
       end

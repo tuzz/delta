@@ -1,4 +1,5 @@
 require "rspec"
+require "support/active_record"
 require "pry"
 require "delta"
 
