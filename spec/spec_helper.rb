@@ -1,5 +1,6 @@
 require "rspec"
-require "support/shared_examples"
+require "support/integration_examples"
+require "support/set_operator_examples"
 require "support/active_record"
 require "pry"
 require "delta"
