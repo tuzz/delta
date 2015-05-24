@@ -172,6 +172,14 @@ In this example, both 'Electric' and 'Flying' types appear in both collections.
 The only difference is the deletion of all 'Water' type Pokemon as a result of
 removing 'Magikarp' from the first collection.
 
+## Rails Support
+
+Delta attempts to improve performance when the given collections are
+ActiveRecord relations. It tries to reduce the number of select queries on your
+database by working with scopes rather than individual records. This isn't
+perfect and won't work with old versions of Rails. If you have ideas of how to
+make this better, I'd appreciate it.
+
 ## In the Wild
 
 So far, we've talked a lot about Pokemon, but how is this useful in the
