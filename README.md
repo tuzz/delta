@@ -1,5 +1,7 @@
 ## Delta
 
+[![Build Status](https://travis-ci.org/tuzz/delta.svg?branch=master)](https://travis-ci.org/tuzz/delta)
+
 Calculates the delta between two collections of objects.
 
 ## Usage
