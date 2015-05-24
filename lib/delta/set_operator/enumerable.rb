@@ -1,6 +1,13 @@
 class Delta
   class SetOperator
     class Enumerable < SetOperator
+      def initialize(a:, b:, identifier:)
+        super
+
+        self.a = a.lazy
+        self.b = b.lazy
+      end
+
       private
 
       def subtract(a, b)

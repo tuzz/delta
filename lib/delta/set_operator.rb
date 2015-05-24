@@ -6,8 +6,8 @@ class Delta
     end
 
     def initialize(a:, b:, identifier:)
-      self.a = a.lazy
-      self.b = b.lazy
+      self.a = a
+      self.b = b
       self.identifier = identifier
     end
 
@@ -23,9 +23,11 @@ class Delta
       intersect(a, b)
     end
 
-    private
+    protected
 
     attr_accessor :a, :b, :identifier
+
+    private
 
     # a - b
     def subtract(_a, _b)
