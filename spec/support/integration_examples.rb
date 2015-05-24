@@ -37,41 +37,7 @@ RSpec.shared_examples "integration specs" do
     expect(second).to_not respond_to(:type)
   end
 
-  it "works for the modification example in the readme (option 1)" do
-    # Add the equality method to class.
-    klass.class_eval do
-      def ==(other)
-        name == other.name
-      end
-    end
-
-    delta = described_class.new(from: from, to: to, pluck: [:species, :name])
-
-    expect(delta.additions.count).to eq 1
-    expect(delta.modifications.count).to eq 1
-    expect(delta.deletions.count).to eq 1
-
-    addition = delta.additions.first
-    expect(addition.species).to eq "Butterfree"
-    expect(addition.name).to eq "Flappy"
-
-    modification = delta.modifications.first
-    expect(modification.species).to eq "Raichu"
-    expect(modification.name).to eq "Zappy"
-
-    deletion = delta.deletions.first
-    expect(deletion.species).to eq "Magikarp"
-    expect(deletion.name).to eq "Splashy"
-
-    # Remove the equality method from class.
-    klass.class_eval do
-      def ==(other)
-        id == other.id
-      end
-    end
-  end
-
-  it "works for the modification example in the readme (option 2)" do
+  it "works for the modification example in the readme" do
     delta = described_class.new(
       from: from,
       to: to,
@@ -96,7 +62,7 @@ RSpec.shared_examples "integration specs" do
     expect(deletion.name).to eq "Splashy"
   end
 
-  it "falls back object equality when no pluck attributes are specified" do
+  it "falls back to object equality when no pluck attributes are specified" do
     # Note: pidgey is the same object in both collections.
 
     delta = described_class.new(from: from, to: to, keys: [:name])

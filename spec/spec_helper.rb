@@ -18,6 +18,4 @@ class Pokemon
     self.name = name
     self.type = type
   end
-
-  alias :id :object_id
 end

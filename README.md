@@ -62,21 +62,8 @@ than additions and deletions. In the example above, 'Pikachu' appeared as a
 deletion and 'Raichu' appeared as an addition. It might make more sense to model
 this as a modification, i.e. 'Zappy' changing its 'species'.
 
-You can do this in one of two ways:
-
-1) You can define the equality method on the objects that appear in the
-collections. e.g.
-
-```ruby
-class Pokemon
-  def ==(other)
-    name == other.name
-  end
-end
-```
-
-2) You can specify the `keys` that uniquely identify objects between
-collections.
+Delta supports setting the `keys` that uniquely identify each object in the
+collection:
 
 ```ruby
 delta = Delta.new(
@@ -85,11 +72,7 @@ delta = Delta.new(
   pluck: [:species, :name],
   keys: [:name]
 )
-```
 
-These options are equivalent and will produce the same results:
-
-```ruby
 delta.additions.to_a
 #=> [#<struct species="Butterfree", name="Flappy">]
 
@@ -100,12 +83,14 @@ delta.deletions.to_a
 #=> [#<struct species="Magikarp", name="Splashy">]
 ```
 
-Regardless of which option you choose, you should specify the attributes to
-`pluck` so that Delta can distinguish between objects that have changed and
-objects that have not changed, but appear in both collections.
+You should specify which attributes to `pluck` so that Delta can distinguish
+between objects that have changed and objects that have not changed, but appear
+in both collections.
 
-If you do not specify any attributes to `pluck`, Delta will fall back to using
-the equality method to determine which objects have been modified.
+If you do not specifiy any attributes to `pluck`, Delta will fall back to using
+object equality to determine which objects have changed. For ActiveRecord
+relations, Delta will use the database id as its fall back as it is more
+performant to do so.
 
 ## Composite Keys
 
@@ -174,11 +159,10 @@ removing 'Magikarp' from the first collection.
 
 ## Rails Support
 
-Delta attempts to improve performance when the given collections are
-ActiveRecord relations. It tries to reduce the number of select queries on your
-database by working with scopes rather than individual records. This isn't
-perfect and won't work with old versions of Rails. If you have ideas of how to
-make this better, I'd appreciate it.
+Delta has added support for Rails applications. If the given collections are of
+class ActiveRecord::Relation, Delta will try to improve performance by reducing
+the number of select queries on the database. This isn't perfect and may not
+work with old versions of Rails.
 
 ## In the Wild
 
