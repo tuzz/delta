@@ -2,6 +2,8 @@ require "spec_helper"
 
 RSpec.describe Delta do
   context "plain objects" do
+    let(:klass) { Pokemon }
+
     let(:pikachu)    { Pokemon.new("Pikachu",    "Zappy",    "Electric") }
     let(:pidgey)     { Pokemon.new("Pidgey",     "Mr. Peck", "Flying")   }
     let(:magikarp)   { Pokemon.new("Magikarp",   "Splashy",  "Water")    }
@@ -15,6 +17,8 @@ RSpec.describe Delta do
   end
 
   context "active record objects" do
+    let(:klass) { Model }
+
     let!(:pikachu)    { Model.create!(species: "Pikachu", name: "Zappy", type: "Electric")   }
     let!(:pidgey)     { Model.create!(species: "Pidgey", name: "Mr. Peck", type: "Flying")   }
     let!(:magikarp)   { Model.create!(species: "Magikarp", name: "Splashy", type: "Water")   }

@@ -38,8 +38,8 @@ RSpec.shared_examples "integration specs" do
   end
 
   it "works for the modification example in the readme (option 1)" do
-    # Add the equality method to Pokemon.
-    Pokemon.class_eval do
+    # Add the equality method to class.
+    klass.class_eval do
       def ==(other)
         name == other.name
       end
@@ -63,10 +63,10 @@ RSpec.shared_examples "integration specs" do
     expect(deletion.species).to eq "Magikarp"
     expect(deletion.name).to eq "Splashy"
 
-    # Remove the equality method from Pokemon.
-    Pokemon.class_eval do
+    # Remove the equality method from class.
+    klass.class_eval do
       def ==(other)
-        object_id == other.object_id
+        id == other.id
       end
     end
   end
