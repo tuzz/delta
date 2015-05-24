@@ -125,8 +125,6 @@ Consider the alternative where 'name' is used as the only key. This would mean
 that the Pokemon with species' 'Butterfree' and 'Magikarp' would be considered
 the same. This is semantically incorrect for this particular domain.
 
-TODO: What would happen if you did that? Should it raise an error?
-
 ## Many-to-one Deltas
 
 By combining the use of `pluck` and `keys`, you can build deltas that aren't
