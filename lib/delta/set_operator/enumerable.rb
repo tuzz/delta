@@ -33,11 +33,16 @@ class Delta
       end
 
       def other_object(collection, object)
-        identity = identifier.identity(object)
+        identity = identity(object)
 
         collection.find do |other_object|
-          identity == identifier.identity(other_object)
+          identity == identity(other_object)
         end
+      end
+
+      def identity(object)
+        @identity_cache ||= {}
+        @identity_cache[object] ||= identifier.identity(object)
       end
     end
   end
