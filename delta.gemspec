@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency "rake"
   s.add_development_dependency "rspec"
-  s.add_development_dependency "rubocop"
+  s.add_development_dependency "rubocop", "~> 0.31.0"
   s.add_development_dependency "pry"
   s.add_development_dependency "activerecord", "~> 4.2.1"
   s.add_development_dependency "sqlite3"

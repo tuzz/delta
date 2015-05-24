@@ -1,31 +1,35 @@
 require "spec_helper"
 
 RSpec.describe Delta::SetOperator do
-
   def adapt(a, b)
     described_class.adapt(a: a, b: b, identifier: nil)
   end
 
   it "chooses the best adapter for the collection type" do
-    a, b = Enumerator.new {}, Enumerator.new {}
+    a = Enumerator.new {}
+    b = Enumerator.new {}
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
 
-    a, b = [], []
+    a = []
+    b = []
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
 
-    a, b = Set.new, Set.new
+    a = Set.new
+    b = Set.new
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
 
-    a, b = Model.all, Model.all
+    a = Model.all
+    b = Model.all
     expect(adapt(a, b)).to be_a(described_class::ActiveRecord)
   end
 
   it "falls back to using Enumerable when the types are mixed" do
-    a, b = [], Set.new
+    a = []
+    b = Set.new
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
 
-    a, b = Model.all, Enumerator.new {}
+    a = Model.all
+    b = Enumerator.new {}
     expect(adapt(a, b)).to be_a(described_class::Enumerable)
   end
-
 end

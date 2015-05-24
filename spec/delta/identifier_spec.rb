@@ -1,7 +1,6 @@
 require "spec_helper"
 
 RSpec.describe Delta::Identifier do
-
   describe "#identity" do
     it "returns a hash of attributes specified by the initializer" do
       subject = described_class.new([:size, :to_s])
@@ -89,5 +88,4 @@ RSpec.describe Delta::Identifier do
       end
     end
   end
-
 end
