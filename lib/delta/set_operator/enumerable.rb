@@ -2,8 +2,8 @@ class Delta
   module SetOperator
     class Enumerable
       def initialize(a:, b:, identifier:)
-        self.a = a
-        self.b = b
+        self.a = a.lazy
+        self.b = b.lazy
         self.identifier = identifier
       end
 
