@@ -18,4 +18,8 @@ class Pokemon
     self.name = name
     self.type = type
   end
+
+  def update(name:)
+    self.name = name
+  end
 end

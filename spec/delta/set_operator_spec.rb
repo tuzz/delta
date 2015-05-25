@@ -2,7 +2,7 @@ require "spec_helper"
 
 RSpec.describe Delta::SetOperator do
   def adapt(a, b)
-    described_class.adapt(a: a, b: b, identifier: nil)
+    described_class.adapt(a: a, b: b, identifiers: [], changes: [])
   end
 
   it "chooses the best adapter for the collection type" do
