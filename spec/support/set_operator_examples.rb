@@ -1,56 +1,124 @@
 RSpec.shared_examples "a set operator" do
-  describe "#subtract_a_from_b" do
-    it "returns the set operation: b - a" do
-      identifier = Delta::Identifier::Null.new
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+  describe "#a_minus_b" do
+    it "returns the set operation: a - b" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        changes: []
+      )
 
-      expect(subject.subtract_a_from_b).to be_an(expected_enumerator_class)
-      expect(subject.subtract_a_from_b.to_a).to eq [raichu, butterfree]
+      expect(subject.a_minus_b).to respond_to(:each)
+      expect(subject.a_minus_b.to_a).to eq [pikachu, magikarp]
     end
 
-    it "uses the identifier to determine object equality" do
-      identifier = Delta::Identifier.new([:name])
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+    it "uses the identifiers to determine object equality" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name],
+        changes: []
+      )
 
-      expect(subject.subtract_a_from_b).to be_an(expected_enumerator_class)
-      expect(subject.subtract_a_from_b.to_a).to eq [butterfree]
+      expect(subject.a_minus_b).to respond_to(:each)
+      expect(subject.a_minus_b.to_a).to eq [magikarp]
+    end
+
+    it "works with more than one identifier" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name, :species],
+        changes: []
+      )
+
+      expect(subject.a_minus_b).to respond_to(:each)
+      expect(subject.a_minus_b.to_a).to eq [pikachu, magikarp]
     end
   end
 
-  describe "#subtract_b_from_a" do
-    it "returns the set operation: a - b" do
-      identifier = Delta::Identifier::Null.new
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+  describe "#b_minus_a" do
+    it "returns the set operation: b - a" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        changes: []
+      )
 
-      expect(subject.subtract_b_from_a).to be_an(expected_enumerator_class)
-      expect(subject.subtract_b_from_a.to_a).to eq [pikachu, magikarp]
+      expect(subject.b_minus_a).to respond_to(:each)
+      expect(subject.b_minus_a.to_a).to eq [raichu, butterfree]
     end
 
-    it "uses the identifier to determine object equality" do
-      identifier = Delta::Identifier.new([:name])
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+    it "uses the identifiers to determine object equality" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name],
+        changes: []
+      )
 
-      expect(subject.subtract_b_from_a).to be_an(expected_enumerator_class)
-      expect(subject.subtract_b_from_a.to_a).to eq [magikarp]
+      expect(subject.b_minus_a).to respond_to(:each)
+      expect(subject.b_minus_a.to_a).to eq [butterfree]
+    end
+
+    it "works with more than one identifier" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name, :species],
+        changes: []
+      )
+
+      expect(subject.b_minus_a).to respond_to(:each)
+      expect(subject.b_minus_a.to_a).to eq [raichu, butterfree]
     end
   end
 
   describe "#intersection" do
-    it "returns both a and b for the set operation: a & b" do
-      identifier = Delta::Identifier::Null.new
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+    it "returns b from the set operation a & b" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name],
+        changes: [:species]
+      )
 
-      expect(subject.intersection.to_a).to eq [[pidgey, pidgey]]
+      expect(subject.intersection.to_a).to eq [raichu]
     end
 
-    it "uses the identifier to determine object equality" do
-      identifier = Delta::Identifier.new([:name])
-      subject = described_class.new(a: a, b: b, identifier: identifier)
+    it "uses the identifiers to determine object equality" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        changes: [:species]
+      )
 
-      expect(subject.intersection.to_a).to eq [
-        [pikachu, raichu],
-        [pidgey, pidgey]
-      ]
+      expect(subject.intersection).to respond_to(:each)
+      expect(subject.intersection.to_a).to eq []
+    end
+
+    it "works with more than one identifier" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:name, :type],
+        changes: [:species]
+      )
+
+      expect(subject.intersection).to respond_to(:each)
+      expect(subject.intersection.to_a).to eq [raichu]
+    end
+
+    it "returns an empty collection if no changes are specified" do
+      subject = described_class.new(
+        a: a,
+        b: b,
+        identifiers: [:species],
+        changes: []
+      )
+
+      expect(subject.intersection.to_a).to eq []
     end
   end
+
+  pending "duplicates aren't being handled properly"
 end

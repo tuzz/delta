@@ -10,8 +10,6 @@ RSpec.describe Delta::SetOperator::Enumerable do
   let(:a) { [pikachu, pidgey, magikarp].to_enum  }
   let(:b) { [raichu, pidgey, butterfree].to_enum }
 
-  let(:expected_enumerator_class) { Enumerator }
-
   it_behaves_like "a set operator"
 
   describe "non-functional requirements" do
@@ -32,7 +30,6 @@ RSpec.describe Delta::SetOperator::Enumerable do
       expect(object.something).to eq("something")
       expect { object.something }.to raise_error, "The test setup is wrong."
 
-      identifier = Delta::Identifier.new([:something])
       foo1 = OneTimeOnly.new("foo")
       foo2 = OneTimeOnly.new("foo")
       bar  = OneTimeOnly.new("bar")
@@ -40,14 +37,13 @@ RSpec.describe Delta::SetOperator::Enumerable do
       subject = described_class.new(
         a: [foo1],
         b: [bar, foo2],
-        identifier: identifier
+        identifiers: [:something],
+        changes: [:object_id]
       )
 
-      expect(subject.subtract_a_from_b).to be_an(Enumerator)
-
-      expect(subject.subtract_a_from_b.to_a).to eq [bar]
-      expect(subject.subtract_b_from_a.to_a).to eq []
-      expect(subject.intersection.to_a).to eq [[foo1, foo2]]
+      expect(subject.a_minus_b.to_a).to eq []
+      expect(subject.b_minus_a.to_a).to eq [bar]
+      expect(subject.intersection.to_a).to eq [foo2]
     end
   end
 end

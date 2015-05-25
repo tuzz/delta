@@ -31,107 +31,97 @@ delta.deletions.to_a
 ]
 ```
 
-## Pluck
+## Identifiers
 
-Sometimes, you'll only be interested in a few of the attributes on an object.
-Delta supports `pluck`, which selects only the attributes you're interested in,
-instead of returning full objects:
+By default, Delta uses
+[object_id](http://ruby-doc.org/core-2.2.2/Object.html#method-i-object_id) to
+compare the collections. You can tell Delta to use something else by setting the
+`identifiers` parameter:
 
 ```ruby
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
-  pluck: [:name, :species]
+  identifiers: [:name]
 )
 
 delta.additions.to_a
-#=> [
-  #<struct name="Zappy", species="Pikachu">,
-  #<struct name="Flappy", species="Butterfree">
-]
+#=> [#<Pokemon @species="Butterfree", @name="Flappy", @type="Flying">]
 
 delta.deletions.to_a
-#=> [
-  #<struct name="Zappy", species="Raichu">,
-  #<struct name="Splashy", species="Magikarp">
-]
+#=> [#<Pokemon @species="Magikarp", @name="Splashy", @type="Water">]
 ```
+
+In this case, 'Raichu' and 'Pikachu' don't appear in the additions or deletions
+because they share the same name and Delta thinks that they are the same object.
 
 ## Modifications
 
 In most cases, it is more appropriate to think in terms of modifications rather
-than additions and deletions. In the example above, 'Pikachu' appeared as a
-deletion and 'Raichu' appeared as an addition. It might make more sense to model
-this as a modification, i.e. 'Zappy' changing its 'species'.
+than additions and deletions.
 
-Delta supports setting the `keys` that uniquely identify each object in the
-collection:
+To calculate modifications, Delta needs to know which things might change on the
+objects. You can tell Delta which things are subject to change by setting the
+`changes` parameter:
 
 ```ruby
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
-  pluck: [:species, :name],
-  keys: [:name]
+  identifiers: [:name],
+  changes: [:species]
 )
 
 delta.additions.to_a
-#=> [#<struct species="Butterfree", name="Flappy">]
+#=> [#<Pokemon @species="Butterfree", @name="Flappy", @type="Flying">]
 
 delta.modifications.to_a
-#=> [#<struct species="Raichu", name="Zappy">]
+#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric">]
 
 delta.deletions.to_a
-#=> [#<struct species="Magikarp", name="Splashy">]
+#=> [#<Pokemon @species="Magikarp", @name="Splashy", @type="Water">]
 ```
 
-You should specify which attributes to `pluck` so that Delta can distinguish
-between objects that have changed and objects that have not changed, but appear
-in both collections.
-
-If you do not specifiy any attributes to `pluck`, Delta will fall back to using
-object equality to determine which objects have changed. For ActiveRecord
-relations, Delta will use the database id as its fall back as it is more
-performant to do so.
+In the above example, 'Zappy' appears as a modification because Delta thinks
+that 'Pikachu' and 'Raichu' are the same object because they share the same
+name.
 
 ## Composite Keys
 
 In some cases, objects will be uniquely identified by a combination of things.
 For example, consider an application that enforces the uniqueness of names, but
-only in the context of a 'type'. This would mean that two Pokemon can have the
-same name, as long as they are not of the same type (e.g. 'Water').
+only in the context of a 'type'.
 
-In these cases, you can specify multiple keys:
+In these cases, you can specify multiple `identifiers`:
 
 ```ruby
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
-  pluck: [:species, :name, :type],
-  keys: [:name, :type] # <--
+  identifiers: [:name, :type]
+  changes: [:species]
 )
 
 delta.additions.to_a
-#=> [#<struct species="Butterfree", name="FANG!", type="Flying">]
+#=> [#<Pokemon @species="Butterfree", @name="FANG!", @type="Flying">]
 
 delta.modifications.to_a
-#=> [#<struct species="Raichu", name="Zappy", type="Electric">]
+#=> [#<Pokemon @species="Raichu", @name="Zappy", @type="Electric">]
 
 delta.deletions.to_a
-#=> [#<struct species="Magikarp", name="FANG!", type="Water">]
+#=> [#<Pokemon @species="Magikarp", @name="FANG!", @type="Water">]
 ```
 
-Consider the alternative where 'name' is used as the only key. This would mean
-that the Pokemon with species' 'Butterfree' and 'Magikarp' would be considered
-the same. This is semantically incorrect for this particular domain.
+If 'name' were the only identifier, Delta would think that 'Butterfree' and
+'Magikarp' are the same object and they would not appear in additions or
+deletions.
 
-## Many-to-one Deltas
+## Many to One
 
-By combining the use of `pluck` and `keys`, you can build deltas that aren't
-necessarily related to a single object, but instead span multiple objects within
-the collection.
+It is possible to build deltas that aren't necessarily related to a single
+object, but instead, span multiple objects within the collections.
 
-This may be useful if there are objects in your collections that share some
+This may be useful if there are objects in your collection that share some
 property. In this example, all of the Pokemon have a 'type'. We can build a
 Delta that shows the difference in types between collections, like so:
 
@@ -139,8 +129,7 @@ Delta that shows the difference in types between collections, like so:
 delta = Delta.new(
   from: [pikachu, pidgey, magikarp],
   to: [raichu, pidgey, butterfree],
-  keys: [:type],
-  pluck: [:type]
+  identifiers: [:type]
 )
 
 delta.additions.to_a
@@ -150,19 +139,19 @@ delta.modifications.to_a
 #=> []
 
 delta.deletions.to_a
-#=> [#<struct type="Water">]
+#=> [#<Pokemon @species="Magikarp", @name="Splashy", @type="Water">]
 ```
 
 In this example, both 'Electric' and 'Flying' types appear in both collections.
-The only difference is the deletion of all 'Water' type Pokemon as a result of
-removing 'Magikarp' from the first collection.
+The only difference is the deletion of all 'Water' type Pokemon. Note that Delta
+will only return the first object that matches the deleted type.
 
 ## Rails Support
 
-Delta has added support for Rails applications. If the given collections are of
-class ActiveRecord::Relation, Delta will try to improve performance by reducing
-the number of select queries on the database. This isn't perfect and may not
-work with old versions of Rails.
+Delta has added support for Rails applications. If the collections are of class
+ActiveRecord::Relation, Delta will try to improve performance by reducing the
+number of select queries on the database. This may not work with old versions of
+Rails.
 
 ## In the Wild
 

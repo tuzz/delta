@@ -12,7 +12,5 @@ RSpec.describe Delta::SetOperator::ActiveRecord do
   let(:a) { Model.where(species: %w(Pikachu Pidgey Magikarp)) }
   let(:b) { Model.where(species: %w(Raichu Pidgey Butterfree)) }
 
-  let(:expected_enumerator_class) { ActiveRecord::Relation }
-
   it_behaves_like "a set operator"
 end
