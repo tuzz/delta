@@ -67,7 +67,7 @@ class Delta
       end
 
       def execute(query, scope)
-        scope.model.find_by_sql(query.to_sql)
+        model_for_scope(scope).find_by_sql(query.to_sql)
       end
 
       def arel_table(scope, name)
@@ -84,6 +84,10 @@ class Delta
 
       def inner_join
         Arel::Nodes::InnerJoin
+      end
+
+      def model_for_scope(scope)
+        scope.respond_to?(:model) ? scope.model : scope.klass
       end
     end
   end
