@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name        = "delta"
-  s.version     = "2.0.0"
+  s.version     = "2.1.0"
   s.licenses    = ["MIT"]
   s.summary     = "Delta"
   s.description = "Calculates the delta between two collections of objects."
