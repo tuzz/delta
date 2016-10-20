@@ -31,7 +31,7 @@ class Delta
 
       def pairs(a, b)
         a.map { |a_object| [a_object, other_object(b, a_object)] }
-          .select { |_, b_object| b_object }
+         .select { |_, b_object| b_object }
       end
 
       def other_object(collection, object)

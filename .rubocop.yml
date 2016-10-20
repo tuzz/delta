@@ -6,3 +6,6 @@ StringLiterals:
 
 Metrics/LineLength:
   Max: 99
+
+AllCops:
+  TargetRubyVersion: 2.1

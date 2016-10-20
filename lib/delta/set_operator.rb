@@ -1,6 +1,6 @@
 class Delta
   class SetOperator
-    ADAPTERS = [ActiveRecord, Enumerable]
+    ADAPTERS = [ActiveRecord, Enumerable].freeze
 
     def self.adapt(a:, b:, identifiers:, changes:)
       adapter = ADAPTERS.find { |klass| klass.compatible?(a, b) }
@@ -41,12 +41,12 @@ class Delta
 
     # a - b
     def subtract(_a, _b)
-      fail NotImplementedError, "override me"
+      raise NotImplementedError, "override me"
     end
 
     # a & b
     def intersect(_a, _b)
-      fail NotImplementedError, "override me"
+      raise NotImplementedError, "override me"
     end
   end
 end
